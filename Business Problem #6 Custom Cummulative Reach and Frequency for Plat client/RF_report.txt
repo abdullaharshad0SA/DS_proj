@@ -37,17 +37,17 @@ Phase B: Relational Metadata Enrichment
 
 Phase C: Two-Tier Frequency Modeling Matrix
 Once a clean, unified log table is generated, the pipeline executes a double aggregation layer:
-1. **User-Level Aggregation (`user_freq`)**: Groups data rows by Campaign ID, Name, and the Unique User 
+1. User-Level Aggregation (`user_freq`): Groups data rows by Campaign ID, Name, and the Unique User 
    Device ID (`uniq_imp_id`). It sums up impression wins (`has_won`) to find exactly how many times an 
    individual user was exposed to a specific ad within the target window.
-2. **Campaign-Level Rollup (`freq_distribution`)**: Processes the user-level dataset to compute global 
+2. Campaign-Level Rollup (`freq_distribution`): Processes the user-level dataset to compute global 
    campaign metrics:
-   $$\text{Reach} = \text{Count of Unique User IDs}$$
-   $$\text{Average Frequency} = \frac{\text{Total Impression Volume}}{\text{Unique User Reach}}$$
-   - **Cumulative Buckets (N+)**: Loops through an array of thresholds (1 to 50) and performs a boolean 
+   Reach = Count of Unique User IDs
+   Average Frequency = Total Impression Volume/Unique User Reach
+   - Cumulative Buckets (N+): Loops through an array of thresholds (1 to 50) and performs a boolean 
      slice filter (`imps >= k`) to isolate the unique user count that reached or crossed that exposure 
      density.
-   - **Exact Buckets (Nx)**: Implements a pivot table matrix conversion (`pivot_table`) that maps user counts 
+   - Exact Buckets (Nx): Implements a pivot table matrix conversion (`pivot_table`) that maps user counts 
      laterally into distinct singular exposure columns (`1x`, `2x`, `3x`, etc.).
 
 This pipeline automates the complex, compute-heavy process of calculating Reach and Frequency across millions 
