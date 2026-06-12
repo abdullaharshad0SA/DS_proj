@@ -17,11 +17,6 @@ import numpy as np
 # Pandas is our primary data analysis library.
 import pandas as pd
 
-
-# ============================================================
-# RESULT OBJECT
-# ============================================================
-
 @dataclass
 class CheckResult:
     """
@@ -46,10 +41,7 @@ class CheckResult:
     # Human-readable explanation
     detail: str
 
-
-# ============================================================
 # SAMPLE DATA CREATION
-# ============================================================
 
 def build_sample_data(seed: int = 42) -> dict[str, pd.DataFrame]:
     """
@@ -88,9 +80,7 @@ def build_sample_data(seed: int = 42) -> dict[str, pd.DataFrame]:
         for i in range(1, 181)
     ]
 
-    # --------------------------------------------------------
     # Accounts table
-    # --------------------------------------------------------
 
     accounts = pd.DataFrame(
         {
@@ -125,9 +115,7 @@ def build_sample_data(seed: int = 42) -> dict[str, pd.DataFrame]:
         }
     )
 
-    # --------------------------------------------------------
     # Opportunities table
-    # --------------------------------------------------------
 
     opportunities = pd.DataFrame(
         {
@@ -181,9 +169,7 @@ def build_sample_data(seed: int = 42) -> dict[str, pd.DataFrame]:
         }
     )
 
-    # --------------------------------------------------------
     # Inject intentional data issues
-    # --------------------------------------------------------
 
     # Duplicate primary key.
     opportunities.loc[5, "opportunity_id"] = (
@@ -196,9 +182,7 @@ def build_sample_data(seed: int = 42) -> dict[str, pd.DataFrame]:
     # Missing revenue value.
     opportunities.loc[25, "amount_reporting"] = np.nan
 
-    # --------------------------------------------------------
     # Revenue source table
-    # --------------------------------------------------------
 
     revenue_source = (
         opportunities[
@@ -233,10 +217,7 @@ def build_sample_data(seed: int = 42) -> dict[str, pd.DataFrame]:
         size=len(mismatch_rows),
     )
 
-    # --------------------------------------------------------
     # Historical row count snapshots
-    # --------------------------------------------------------
-
     row_count_history = pd.DataFrame(
         {
             "table_name": ["opportunities"] * 7,
@@ -266,10 +247,7 @@ def build_sample_data(seed: int = 42) -> dict[str, pd.DataFrame]:
         "row_count_history": row_count_history,
     }
 
-
-# ============================================================
 # REQUIRED FIELD TEST
-# ============================================================
 
 # checks if col exists
 # checks col contains no nulls
@@ -324,10 +302,7 @@ def check_required_fields(
 
     return results
 
-
-# ============================================================
 # DUPLICATE KEY TEST
-# ============================================================
 
 def check_duplicate_key(
     df: pd.DataFrame,
@@ -358,9 +333,7 @@ def check_duplicate_key(
     )
 
 
-# ============================================================
 # FRESHNESS TEST
-# ============================================================
 
 def check_freshness(
     df: pd.DataFrame,
@@ -398,9 +371,7 @@ def check_freshness(
     )
 
 
-# ============================================================
 # VALID VALUES TEST
-# ============================================================
 
 def check_valid_values(
     df: pd.DataFrame,
@@ -439,9 +410,7 @@ def check_valid_values(
     )
 
 
-# ============================================================
 # REVENUE RECONCILIATION TEST
-# ============================================================
 
 def check_revenue_reconciliation(
     opportunities: pd.DataFrame,
@@ -491,9 +460,7 @@ def check_revenue_reconciliation(
     return result, mismatch_rows
 
 
-# ============================================================
 # ROW COUNT ANOMALY TEST
-# ============================================================
 
 def check_row_count_drop(
     row_count_history: pd.DataFrame,
@@ -541,9 +508,7 @@ def check_row_count_drop(
     )
 
 
-# ============================================================
 # REPORTING
-# ============================================================
 
 def print_monitor_report(
     results_df: pd.DataFrame,
@@ -598,10 +563,6 @@ def print_monitor_report(
             .to_string(index=False)
         )
 
-
-# ============================================================
-# MAIN PROGRAM
-# ============================================================
 
 # Load data
 data = build_sample_data()

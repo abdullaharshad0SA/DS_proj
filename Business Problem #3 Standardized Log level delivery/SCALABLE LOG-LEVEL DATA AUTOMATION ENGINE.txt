@@ -1,15 +1,14 @@
-====================================================================================================
 EXECUTIVE PRODUCT BRIEF: SCALABLE LOG-LEVEL DATA (LLD) AUTOMATION ENGINE
-====================================================================================================
+
 Hey Sam, This project was a much largest initiative designed to templatize our Log level delivery solution. It was aimed to improve service excellence and operational efficiency. Because this was such an important report, I have added more detail to help explain the problem and solutioning. 
 
 Project Scope: Log-Level Data (LLD) Scalable Core & End-to-End Self-Service Integration
 Current Impact: Saved 100+ manual analyst hours in Q2 alone (2 months so far)
 System Status: Transitioning from Automated Template to Fully Autonomous End-to-End Engine (phase 2)
 
-----------------------------------------------------------------------------------------------------
+
 1. EXECUTIVE SUMMARY & VALUE PROPOSITION
-----------------------------------------------------------------------------------------------------
+
 Custom Log-Level Data (LLD) extractions historically represented an operational bottleneck. 
 Each custom client data request required an analyst to manually write SQL queries, handle timezone 
 conversions, normalize micro-dollar configurations, partition large datasets, and execute bespoke 
@@ -30,12 +29,11 @@ Freshservice system parameters will programmatically trigger the Kestra orchestr
 completely removes human intervention, establishing a true zero-touch, self-service infrastructure.
 My goal is to have this completed by end of year, as it stands we are on track. 
 
-----------------------------------------------------------------------------------------------------
+
 2. ARCHITECTURAL DATA FLOW & CORE CAPABILITIES
-----------------------------------------------------------------------------------------------------
+
 The engine is structured around three programmatic phases: Parameter Parsing, Unified Extraction, 
 and Multi-Destination Delivery Routing.
-
 
 Phase A: Automated Initialization & Token Swapping
 - The environment interrogates the platform kernel (`platform.system()`) to map appropriate absolute 
@@ -65,9 +63,9 @@ data streams across four enterprise-grade endpoints dynamically based on the inp
 3. S3_BUCKET     -> Ships large-scale compressed objects directly to secure AWS storage buckets.
 4. SFTP          -> Establishes programmatic SSH transport tunnels using `paramiko` to deliver data straight to client infrastructure.
 
-----------------------------------------------------------------------------------------------------
+
 3. ADVANCED ENGINEERING HIGHLIGHTS & OPERATIONAL SAFEGUARDS
-----------------------------------------------------------------------------------------------------
+
 - In-Memory Buffer Streaming: To protect containerized environments from out-of-memory crashes 
   and disk spatial exhaustion, data outputs are structured utilizing virtual file buffers (`io.StringIO`). 
   The codebase completely avoids intermediate disk writes during dataset processing, processing large data 
@@ -78,9 +76,9 @@ data streams across four enterprise-grade endpoints dynamically based on the inp
   monitoring channels (`da-lld-notification`). This ensures real-time oversight of system completions or 
   failures.
 
-----------------------------------------------------------------------------------------------------
+
 4. ROADMAP: TRANSITION TO SYSTEMIC SELF-SERVICE
-----------------------------------------------------------------------------------------------------
+
 Old way: [Manual Ingestion Model - Historical]
 Client Request ──> Analyst Manually Codes Query ──> Manual Run ──> Client Delivery
 

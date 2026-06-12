@@ -1145,9 +1145,8 @@ print("rows_without_luid:", luid_result["rows_without_luid"])
 print("luid_fill_rate:", luid_result["luid_fill_rate"])
 
 
-#   ##  ##  ##
 # Part 2:  Stitch experian ID to dataset. 
-#   ##  ##  ##
+
 s3 = boto3.client("s3")
 resp = s3.list_objects_v2(
     Bucket="experian-stackadapt",
@@ -1253,7 +1252,7 @@ df_export_spark = (
     )
 )
 ###
-# Part 4: write to client sftp location and our s3
+# Part 3: write to client sftp location and our s3
 ###
 
 s3 = boto3.client("s3")

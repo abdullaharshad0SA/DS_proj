@@ -348,9 +348,7 @@ def print_method_note(quality_flags: pd.DataFrame) -> None:
 
     # Construct the documentation report structure body using an explicit Python multi-line f-string
     note = f"""
-====================================================================================================
 TOUCHPOINT INFLUENCE METHOD NOTE
-====================================================================================================
 This is a campaign influence model dashboard using inline processed synthetic CRM data.
 
 The system execution tracking pipeline completed:
@@ -365,7 +363,6 @@ Quality anomalies captured during this analysis sequence:
 Model Caveat & Warning:
 Attribution modeling provides logical perspectives based on clean input patterns; it is not absolute.
 This system acts to surface assumptions clearly and identify dirty data workflows before scoring.
-====================================================================================================
 """
     # Stream the formatted report string directly to the terminal stdout view
     print(note)

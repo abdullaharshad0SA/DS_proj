@@ -1,4 +1,4 @@
-Hey sam, Just to mention for most of these python scripts, I do use a function called `daily_looper_fun()`. I don't go over this extenively in the script but this script determines which Redshift shard the data lives in (based on the advertiser id), it also censors certain fields based on the geographic region of the user and whether they had cookies enables on the site when they visit the site. This is a security/PII check we enforce on any data pull. This fuction is maintained by me and as legal implements new rules, I do make changes. 
+Hey Sam, Just to mention for most of these python scripts, I do use a function called `daily_looper_fun()`. I don't go over this extenively in the script but this script determines which Redshift shard the data lives in (based on the advertiser id), it also censors certain fields based on the geographic region of the user and whether they had cookies enables on the site when they visit the site. This is a security/PII check we enforce on any data pull. This fuction is maintained by me and as legal implements new rules, I do make changes. 
 
 Here is what every SQL query needs to go thru before its pulls from redshift:
 
