@@ -1,0 +1,24 @@
+SELECT 
+              native_ads.id as nativead_id, 
+              CASE
+                WHEN REGEXP_INSTR(JSON_EXTRACT(native_ads.input_data, '$.display_js_creative'), '(?<=Creative Testing: )[a-zA-Z]+') THEN
+                  REGEXP_SUBSTR(JSON_EXTRACT(native_ads.input_data, '$.display_js_creative'),'(?<=Creative Testing: )[^;]+')
+                WHEN creatives.file_name LIKE 'CREATIVESTUDIO_%%' AND REGEXP_INSTR(creatives.file_name, '[_-]CT[_-]') THEN
+                  REGEXP_SUBSTR(creatives.file_name,'(?<=[_-]CT[_-])[a-zA-Z0-9-]+')
+                WHEN creatives.file_name LIKE 'CLIENTCREATIVE_%%' AND REGEXP_INSTR(creatives.file_name, '[_-]CT[_-]') THEN
+                  REGEXP_SUBSTR(creatives.file_name,'(?<=[_-]CT[_-])[a-zA-Z0-9-]+')
+                ELSE NULL
+              END AS creative_testing,
+              CASE
+                WHEN REGEXP_INSTR(JSON_EXTRACT(native_ads.input_data, '$.display_js_creative'), '(?<=Date: )[0-9]+') THEN
+                  REGEXP_SUBSTR(JSON_EXTRACT(native_ads.input_data, '$.display_js_creative'),'(?<=Date: )[^;]+')
+                ELSE NULL
+              END AS cs_date,
+              CASE
+                WHEN REGEXP_INSTR(JSON_EXTRACT(native_ads.input_data, '$.display_js_creative'), '(?<=Creative Insights: )[a-zA-Z]+') THEN
+                  REGEXP_SUBSTR(JSON_EXTRACT(native_ads.input_data, '$.display_js_creative'),'(?<=Creative Insights: )[^;]+')
+                ELSE NULL
+              END AS creative_insights
+          FROM native_ads 
+              LEFT JOIN creatives_native_ads ON  native_ads.id=creatives_native_ads.native_ad_id
+              LEFT JOIN creatives ON creatives_native_ads.creative_id=creatives.id

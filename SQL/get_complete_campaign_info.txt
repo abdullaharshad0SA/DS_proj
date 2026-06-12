@@ -1,0 +1,62 @@
+SELECT
+                        campaigns.id as Campaign_ID,
+                        line_items.id as IO_ID,
+                        users.id as User_ID,
+                        users.conversion_attribution as conversion_attribution,
+                        campaigns.name as Campaign_Name,
+                        campaigns.goal as Campaign_Goal,
+                        campaigns.first_goal_type as First_Goal_Type,
+                        campaigns.first_goal_value as First_Goal,
+                        campaigns.secondary_goal_type as Secondary_Goal_Type,
+                        campaigns.secondary_goal_value as Secondary_Goal,
+                        concat(if (campaigns.optimize_cpc>0,'cpc',''),
+                              if (campaigns.optimize_ctr>0,'ctr',''),
+                              if (campaigns.optimize_cpe>0,'cpe',''),
+                              if (campaigns.optimize_cpv>0,'cpv','')) as Campaign_First_Goal_Type,
+                        campaigns.optimize_cpc as CPC_goal,
+                        campaigns.optimize_ctr as CTR_goal,
+                        campaigns.optimize_cpe as CPE_goal,
+                        campaigns.optimize_cpv as CPV_goal,
+                        campaigns.optimize_viewability as Viewability_goal,
+                        campaigns.user_cpa as CPA_goal,
+                        campaigns.type AS Campaign_Type,
+                        CASE
+                        WHEN campaigns.subtype = 0 THEN 'Standard'
+                        WHEN campaigns.subtype = 1 THEN 'Blended In-Game'
+                        WHEN campaigns.subtype = 2 THEN 'OTT'
+                        WHEN campaigns.subtype IN (3,4) THEN 'DOOH'
+                        WHEN campaigns.subtype IN (5,6) THEN 'App-install'
+                        WHEN campaigns.subtype = 7 THEN 'Cable Video-On-Demand'
+                        WHEN campaigns.subtype = 8 THEN 'Live Linear TV'
+                        ELSE campaigns.subtype
+                      END AS Campaign_Subtype,
+                        campaigns.first_goal_type as Campaign_SA_First_Goal_Type,
+                        campaigns.bid_amount as Campaign_Bid_Amount,
+                        campaigns.bid_type as Campaign_SA_Bid_Type,
+                        campaigns.budget as Campaign_Budget,
+                        campaigns.daily_cap AS Campaign_Daily,
+                        campaigns.start_date as Campaign_Start_Date,
+                        campaigns.end_date as Campaign_End_Date,
+                        campaigns.state as Campaign_State,
+                        line_items.name as IO_Name,
+                        line_items.state as IO_Status,
+                        line_items.budget AS IO_Budget,
+                        line_items.daily_cap AS IO_Daily_Cap,
+                        line_items.start_date AS IO_Start_Date,
+                        line_items.end_date AS IO_End_Date,
+                        line_items.revenue_value AS IO_revenue_value,
+                        (CASE line_items.budget_type
+                          WHEN 'click' THEN 'Clicks'
+                          WHEN 'cost' THEN 'Media Cost'
+                          WHEN 'imp' THEN 'Impressions'
+                          WHEN 'media' THEN 'Media Cost'
+                          WHEN 'revenue' THEN 'Revenue'
+                         ELSE '' END) IO_Budget_Type,
+                        users.account_name as Adv_Name,
+                        users.timezone as Time_zone,
+                        sub_advertisers.name as Sub_Adv_Name,
+                        users.team_admin_email as Account_Email
+FROM campaigns
+    LEFT JOIN line_items ON campaigns.line_item_id=line_items.id
+    LEFT JOIN sub_advertisers ON campaigns.sub_advertiser_id=sub_advertisers.id
+    LEFT JOIN users ON campaigns.user_id=users.id

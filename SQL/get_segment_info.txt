@@ -1,0 +1,31 @@
+SELECT
+    custom_segments.identifier as identifier,
+    ifnull(custom_segments.display_name,custom_segments.name) as name,
+    (CASE
+    WHEN identifier IN ('c_33N','c_1Fp','c_33M','c_1K6') THEN 'Demo Gender'
+    WHEN identifier IN ('c_33P','c_33Q','c_33R','c_33S','c_33T','c_33U','c_1EQ','c_1JJ','c_1F4','c_33U') THEN 'Demo Age'
+    WHEN identifier IN ('c_3K1','c_3kL') THEN 'Sensitive Age Group'
+    WHEN identifier IN ('c_34i','c_1FJ','c_34h','c_34d','c_1K7','c_34g','c_1K0','c_34f','c_1K9','c_34e','c_1K8','c_34j') THEN 'Demo HHI'
+    WHEN (custom_segments.name LIKE '*StackAdapt >%'
+    OR campaigns_custom_segments.segment_type = 'data')  THEN 'Interest Segment'
+    WHEN (mode = 1 OR mode = 2 OR mode = 3 OR mode = 4) THEN 'Custom Browsing'
+    WHEN mode = 5 THEN 'Geo Radiuses'
+    WHEN mode = 6 THEN 'Intersection'
+    WHEN mode = 7 THEN 'ISP'
+    WHEN (mode = 8 OR misc_info LIKE \'%\"third_party_segments\":[\"%\')
+    AND (misc_info IS NULL OR NOT misc_info LIKE \'%\"third_party_segments\":[\"\"]%\')  THEN \'Third Party\'
+    WHEN mode = 9 THEN 'Lookalike'
+    WHEN (mode = 10 OR mode = 13 OR mode = 15 OR mode = 16
+    OR custom_segments.name LIKE '%CRM >%'
+    OR custom_segments.name LIKE '%.csv%') THEN 'User Upload (CRM/IP/Device)'
+    WHEN mode = 11 THEN 'Domain Categories'
+    WHEN mode = 12 THEN 'Audience Extension'
+    WHEN mode = 14 THEN 'Custom Browsing'
+    WHEN mode = 18 THEN 'Keyword Rule Targeting'
+    WHEN campaigns_custom_segments.segment_type = 'custom' THEN 'Custom Browsing'
+    WHEN campaigns_custom_segments.segment_type IN ('conversion_lookalike'|'non_bounce_lookalike'|'auto_exclude_converters') THEN NULL
+    ELSE segment_type END) as segment_type
+    
+    FROM campaigns_custom_segments
+    LEFT JOIN custom_segments ON campaigns_custom_segments.custom_segment_id = custom_segments.id
+    LEFT JOIN campaigns ON campaigns_custom_segments.campaign_id = campaigns.id
