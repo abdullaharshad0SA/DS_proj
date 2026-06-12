@@ -1,0 +1,42 @@
+Executive Briefing: Log-Level Identity Stitching & IQVIA Enrichment Pipeline
+
+Hey Sam, here is a summary of the problem I needed to work on for a very critical client. This solutioning alone helped secure a lot of $$. This one isn't a templitized solution, but because of the millions of dollars tied to it, I was pulled to this request. Wanted to showcase the SQL, Python, Pyspark and overall solutioning the I implemented here. This request required a lot of researching as noone at stackadapt had really worked on anything similar and fill-rates and collision issues were not apparent from the get-go
+
+The client requires programmatic, log-level advertising data (bidstream logs) from our platform. However, to integrate this data into their internal infrastructure, the records must be enriched with their own proprietary tracker token: the Experian IQVIA Synthetic Key.
+To accomplish this, the pipeline ingests raw bidstream logs from Redshift, handles complex entity data mapping from MySQL databases, abstracts an omni-channel identity resolution graph using AWS S3 and PySpark, resolves identity collisions, and delivers compressed, Pipe-Separated Value (PSV) data directly to the client via secure SFTP.
+
+Technical Architecture & Core Flow
+
+1. Bidstream Extraction & Conversion (Redshift)
+Ingestion: The script targets an audience segment or campaign level line-item (line_item_id: 433722) and extracts won impressions, clicks, or conversions within a specified date window.
+Timezone Normalization: It dynamically lookups the user’s regional account timezone from operational databases and leverages a timezone translation matrix to accurately convert standard UTC timestamps into localized times (RS_timezone) for clean reporting.
+Micro-Dollar Correction: Redshift natively handles financial transactions and costs in micro-dollars to ensure floating-point accuracy. The pipeline divides performance and billing columns (cost, stats_revenue, stats_profit, etc.) by 1,000,000.0 to normalize them back into standard decimal dollar values for client facing reporting.
+
+2. Structural Schema & Operational Enrichment (MySQL)
+Metadata Mapping: Raw bidstream rows only contain numeric entity identifiers. The pipeline executes targeted INNER JOIN queries across multiple tables (native_ads, campaigns, line_items, sub_advertisers, users) to pull descriptive strings like campaign names, creative descriptors, and advertiser structures.
+Segment Evaluation: The script dynamically isolates custom segment identifiers (matched_cseg_and_rt) and cross-references them against targeted tables (custom_segments and rt_segments) to enrich records with human-readable audience segment names.
+
+3. Large-Scale Identity Resolution (PySpark Graph Flattening)
+Because processing identity graphs involving millions of records can exhaust typical system memory, a dedicated heavy-duty SparkSession is configured on the EC2 instance (allocated with 80g driver memory and local spill directory optimization).
+Targeted Filtering: Instead of parsing and deduplicating the entire identity graph repository (sa-identity), the pipeline extracts unique Device User IDs (request_duid_sha256 and most_associated_duid_sha256) from our extracted logs and filters the identity graph to only relevant entries.
+Stage 1 Join (DUID -> LUID): Maps filtered device IDs to localized experian identity tokens (LUIDs).
+Stage 2 Join (LUID -> IQVIA Key): Pulls the latest Experian graph mapping partition from S3 and maps resolved LUIDs directly to the definitive Experian_IQVIA_Synthetic_key.
+
+Core Engineering Assumptions & Validation Guardrails
+The 1-to-Many Collision Resolution Strategy
+The Reality: Identity mapping isn't always linear. While 94% of the DUID-to-LUID linkages maintain a perfect, clean 1:1 relationship, the remaining 6% are complex 1-to-many anomalies (where a single device links to 2, 3, or up to 50 distinct LUID tokens).
+The Strategy: In coordination with our internal Identity Team, a deterministic random assignment was approved as a statistically sound approximation for this 6% variant.
+The Implementation: The script implements an efficient PySpark Window function that partitions the records by device ID and applies a randomized index ranking anchored on a static seed (seed=42).
+
+Following the completion of the joining, we see the following;
+
+LUID Match Fill Rate: 80% Fill Rate 
+IQVIA Synthetic Key Fill Rate: ~70% Final Fill Rate
+
+The final client is really only concerned about the IQVIA Synthetic Key Fill Rate being close to 50%, so we are actually above the target rate. Furthermore, because our underlying identity graph engine continuously ingests more data, machine learning corrections, and partner match updates over time, this metric is architected to automatically scale upward in accuracy and completeness without requiring manual code refactoring.
+
+File Synthesis: The resulting enriched Spark dataframe is coalesced into a single partition layer and structured with standard client specifications: a compressed, Pipe-Separated Value file format (.psv.gz).
+
+Automated Deliverables Deployment: The file naming convention dynamically references execution dates (SA_MediaOS_YYYYMMDD.psv.gz). The script writes the artifact to our production S3 storage, downloads it to a secure localized /tmp cache, initiates a secure programmatic transport bridge using paramiko, uploads the data packet directly into the client’s designated SFTP landing zone, and streams verification audits (such as byte size and file updates) back to corporate logging platforms.
+
+Finally, this script is automated on Kestra (orchestration tool) and set to run daily at 10AM EST. 

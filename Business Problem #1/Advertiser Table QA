@@ -1,0 +1,22 @@
+Hey Sam!
+
+I mention this in our chat, but here is the hourly QA checker that flags the team when we do have discrepncy in our bidstream data on Redshift.
+The script does the following:
+
+[Step 1: Environmental Setup]
+-->
+[Step 2: Loop Over Target Date Window (T-1)] #Note that in the past I used to do this for a 3 day lookback, but because infra got the sync more stable, 1 day is all we need now. 
+-->
+[Step 3: Extract & Aggregate Raw Bidstream Logs from 4 Redshift Clusters]
+-->
+[Step 4: Iterate Advertisers & Fetch Aggregated Metrics from TiDB]
+-->
+[Step 5: Apply SKAdNetwork (SKAN) Deduplication Adjustments]
+-->
+[Step 6: Compute Absolute & Percentage Variances for All Core Metrics]
+-->
+[Step 7: Evaluate Automation Flags (> 0.5% Discrepancy Threshold)] # We are poised to up this threshold to 0.1% by End of Q3 as we transition from Redshift to Iceberg.
+-->
+[Step 8: Push Incidents to Slack (If Any) & Upsert Full Audit Log to Snowflake]
+
+Now, this script is automated on kestra and part 2 of the kestra flow is a seprate script that looks at the Audit log and evaluates whether it is P1,P2,P3 and a templatized email is sent to the appropriate shareholders (Data team, Engineering team, Leadership,...)

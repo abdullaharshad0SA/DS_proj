@@ -1,0 +1,46 @@
+Hey Sam!
+Just like Business Problem 4, this is all randomly generated data. the goal here is more failure detection and failure check. Relates more to the type of work we would be doing at grafana. 
+
+Modern data teams frequently experience "silent pipeline failures"—incidents where automated ingestion 
+runs technically succeed without throwing code errors, but output stale, duplicated, or un-reconciled data 
+downstream. If unchecked, business leaders end up making high-stakes strategic choices based on corrupted 
+reporting metrics.
+
+The `Reporting_Health_Monitor.py` script addresses this exact vulnerability. It functions as an 
+automated gatekeeper and anomaly detection system for core enterprise operational databases. 
+Structured using strict Object-Oriented principles and Python Data Classes, the engine conducts 
+comprehensive multi-vector integrity tests across master Account, Opportunity, and Financial records.
+
+1. Missing Values & Structural Completeness Test (`check_missing_values`)
+   - Scans designated operational database columns for critical null indicators or whitespace gaps.
+   - Computes both the absolute row failure counts and the exact missing metric percentage rate.
+
+2. Referential Integrity & Key Association Test (`check_referential_integrity`)
+   - Performs a left-outer verification scan between child transactional ledgers and master account 
+     directories (e.g., verifying `account_id` links between opportunities and accounts).
+   - Instantly exposes "orphan rows" that lack valid reference parents in primary data sources.
+
+3. Uniqueness & Primary Key Duplicate Guard (`check_duplicate_key`)
+   - Validates that unique identity tokens are strictly singular.
+   - Identifies whether database sync bugs or improper upserts have accidentally introduced duplicate entries.
+
+4. Timeline Freshness & Data Sync Lag Monitor (`check_freshness`)
+   - Measures pipeline synchronization lag by calculating the absolute elapsed days between system 
+     execution dates and the table's maximum record update timestamp (`updated_at`).
+   - Flags anomalies if data ingestion processes stall beyond a strict, hardcoded threshold.
+
+5. Domain Constraint & State Validation Test (`check_valid_values`)
+   - Enforces business process rules at the data tier. 
+   - Cross-checks column categorical values against a strict, predefined set of valid business phases 
+     (e.g., verifying pipeline opportunities conform to verified stages like Prospecting, Evaluation, 
+     Closed Won, etc.).
+
+6. Cross-System Financial Revenue Reconciliation (`check_revenue_reconciliation`)
+   - Acts as a financial auditing layer by executing a primary key join between sales pipelines 
+     and third-party billing tables.
+   - Computes absolute delta calculations on recorded monetary amounts to isolate downstream leakage.
+
+
+This validation framework represents the core architecture of our data engineering reliability engine. 
+Because the monitoring components are written as modular, standalone functions, they can be easily 
+scaled to scan any new database table added to our ecosystem. 

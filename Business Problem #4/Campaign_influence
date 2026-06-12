@@ -1,0 +1,57 @@
+Hey Sam,
+As a change in pace, I created this solution to showcase how problems are dealt with. Here I am not using stackadapt data but rather creating some simple datasets that will be used to learn some things about campaigns types that influence revenue. The four models are very commonly used attribution types in the industry. I guess what I wanted to showcase was error handling and data manupulation using numpy + pandas. 
+
+Determining the exact return on investment (ROI) for complex B2B marketing initiatives is a 
+notorious financial engineering challenge. Closed sales opportunities are rarely driven by a single 
+interaction; instead, prospective buyers touch various demand-generation webinars, partner 
+campaigns, and retargeting ads over long sales cycles.
+
+This script implements an automated framework that ingestion-processes raw, programmatic 
+marketing logs and correlates them directly to open and closed CRM pipeline value. It isolates 
+systemic data gaps, establishes a clean chronological interaction fact table, and applies 
+four mathematical attribution models simultaneously. 
+
+By calculating multi-touch revenue fractions programmatically, this system eliminates subjective 
+biases in marketing reporting. It provides the business with verifiable data regarding which 
+channels and campaign strategy pairs are actually driving bottom-line pipeline dollars.
+
+The script models an advanced data science data pipeline, running from raw data synthesis up to a 
+complex, normalized analytical summary rollup.
+
+Phase A: Strict Input Sanitization & Anomaly Detection Logs
+- Standardizes inconsistent source inputs by explicitly casting timestamps into high-precision 
+  Pandas datetime structures via `errors='coerce'`. 
+- Runs a multi-tier programmatic diagnostic rule engine to capture and flag critical data issues:
+  * Orphan Records (`opportunity_not_found`)
+  * Data Collisions (`account_mismatch`)
+  * Incomplete Meta Classifications (`missing_campaign_type`)
+  * Out-of-Bounds Timeline Inversions (`touch_after_close`)
+  * Systemic Duplicate Tracking Rows (`duplicate_touchpoint`)
+- Flawed events are cleanly moved into a separate audit trail dataframe, ensuring downstream facts 
+  are structurally perfect without breaking active execution pipelines.
+
+Phase B: High-Performance Fact Table Sequencing
+- Executes an `INNER JOIN` across opportunities and touchpoints, filtering out dirty inputs.
+- Groups interaction rows by individual deal IDs and maps relative positions chronologically 
+  using Pandas `.cumcount() + 1` windowing functions.
+- Quantifies exact entry and exit attributes by flagging rows dynamically as `is_first_touch` and 
+  `is_last_touch` using vectorized boolean conditions.
+
+Phase C: Simultaneous Four-Model Attribution Processor
+The engine maps out revenue values in real-time across four distinct perspectives:
+1. FIRST TOUCH MODEL     -> Grants 100% of the financial pipeline credit to the initiating campaign.
+2. LAST TOUCH MODEL      -> Grants 100% of the credit to the final conversion touchpoint.
+3. EVEN SPLIT MODEL      -> Evenly fractures the opportunity dollar value across all tied records.
+4. POSITION-WEIGHTED     -> Executes a specialized U-Shaped curve distribution (40% to First Touch, 
+                            40% to Last Touch, and divides the remaining 20% across all mid-funnel events).
+
+Algebraic Guardrail: To eliminate rounding drift, the code calculates group sums and normalizes 
+individual position weights. This guarantees the combined fractional allocations never exceed 
+exactly 100% of the actual underlying pipeline revenue.
+
+This pipeline provides the foundational math engine for our marketing performance reporting. 
+The current script is fully self-contained with robust fallback processing rules. The forward-looking 
+roadmap involves productionizing this script as a recurring job within our automated workflows, 
+directly outputting the finalized attribution matrices into BI visualization layers (such as Tableau 
+or Looker Studio). This allows leaders to instantly shift spend away from underperforming 
+channels and double-down on high-efficiency campaign variants.
