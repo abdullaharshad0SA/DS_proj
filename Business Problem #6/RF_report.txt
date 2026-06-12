@@ -1,0 +1,59 @@
+Hey Sam,
+Another Business problem. Reach and frequency for a political client. 
+
+In digital advertising, basic metrics like gross impression counts fail to explain real audience 
+saturation. To measure true campaign health, ad operations teams must calculate Reach (the number 
+of unique users exposed) and Frequency (how many times a unique user saw an ad). Understanding 
+the distribution—how many users saw an ad exactly 1 time, 5 times, or 20+ times—is critical for 
+preventing ad fatigue and maximizing budget efficiency.
+
+This script implements an automated framework that processes raw, log-level advertising data (bidstream 
+logs) to compute granular, deduplicated audience Reach and Frequency profiles. It normalizes 
+cross-regional timezones, blends raw logs with operational campaign metadata, and groups user 
+exposure counts into both exact-count buckets and Google-style cumulative exposure windows (e.g., 1+, 
+5+, 10+, 20+, up to 50+ impressions). 
+
+By providing automated weekly slices alongside total campaign flight summaries, this pipeline 
+enables ad operations to evaluate audience saturation dynamics across precise historical phases.
+
+The suite follows an extraction, transformation, enrichment, and segmented matrix calculation flow:
+
+Phase A: Dynamic Localized Extraction & Ingestion Loops
+- **Server Detection Setup**: Automatically scales path configurations based on the execution platform 
+  (Linux EC2 vs. Local MacOS dev environments) to pull required helper modules (`QueryBuilder`).
+- **Timezone Translation Matrix**: Real-world ad servers capture interactions globally in UTC. This 
+  script takes a target timezone constraint (`US/Eastern`) and passes dates through a translation layer 
+  (`utc_translation`). This allows the underlying query to accurately isolate a localized 
+  business day partition before pulling data.
+- **Horizontal Daily Looper**: To pull millions of records without causing memory exhaustion, the code 
+  calculates a precise flight duration window (`dur`) and invokes an incremental chunk handler 
+  (`daily_looper_fun`). This systematically scans and extracts raw logs from clustered storage tables.
+
+Phase B: Relational Metadata Enrichment
+- Raw log-level records only identify line items by a numeric sequence ID (`line_item_id` / `cg_id`). 
+  The codebase opens a database driver instance to the operational platform tier (`mydb_conn_func()`).
+- It extracts a reference map matching active entity keys to human-readable names (`line_items.name`) 
+  and applies a vectorized left-merge (`how='left'`) onto the localized logs workspace.
+
+Phase C: Two-Tier Frequency Modeling Matrix
+Once a clean, unified log table is generated, the pipeline executes a double aggregation layer:
+1. **User-Level Aggregation (`user_freq`)**: Groups data rows by Campaign ID, Name, and the Unique User 
+   Device ID (`uniq_imp_id`). It sums up impression wins (`has_won`) to find exactly how many times an 
+   individual user was exposed to a specific ad within the target window.
+2. **Campaign-Level Rollup (`freq_distribution`)**: Processes the user-level dataset to compute global 
+   campaign metrics:
+   $$\text{Reach} = \text{Count of Unique User IDs}$$
+   $$\text{Average Frequency} = \frac{\text{Total Impression Volume}}{\text{Unique User Reach}}$$
+   - **Cumulative Buckets (N+)**: Loops through an array of thresholds (1 to 50) and performs a boolean 
+     slice filter (`imps >= k`) to isolate the unique user count that reached or crossed that exposure 
+     density.
+   - **Exact Buckets (Nx)**: Implements a pivot table matrix conversion (`pivot_table`) that maps user counts 
+     laterally into distinct singular exposure columns (`1x`, `2x`, `3x`, etc.).
+
+This pipeline automates the complex, compute-heavy process of calculating Reach and Frequency across millions 
+of log lines. Moving forward, the goal is to integrate these modular functions directly into our 
+scheduled reporting pipelines. By connecting this calculation block to a centralized data warehouse, 
+we can completely eliminate the manual configuration of campaign IDs and dates. This will transform the script 
+into a self-sustaining analytics microservice that populates customer-facing dashboards with real-time audience 
+saturation insights automatically.
+====================================================================================================
